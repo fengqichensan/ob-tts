@@ -1,0 +1,28 @@
+{
+	"name": "ob-tts",
+	"version": "1.0.0",
+	"description": "ob-tts 是一个为 Obsidian 设计的文字转语音（Text-to-Speech, TTS）插件。",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"@google/genai": "^1.17.0",
+		"mime": "^3.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^16.18.126",
+		"@typescript-eslint/eslint-plugin": "5.29.0",
+		"@typescript-eslint/parser": "5.29.0",
+		"builtin-modules": "3.3.0",
+		"esbuild": "0.17.3",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "4.7.4"
+	}
+}

@@ -1,0 +1,9 @@
+# npm
+node_modules
+
+# obsidian 设置内容
+data.json
+
+# Don't include the compiled main.js file in the repo.
+# They should be uploaded to GitHub releases instead.
+main.js
