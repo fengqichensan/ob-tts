@@ -2,8 +2,8 @@ name: Release Obsidian plugin
 
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 jobs:
   build:
@@ -18,16 +18,29 @@ jobs:
         with:
           node-version: "18.x"
 
+      - name: Read version from manifest.json
+        id: manifest
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build plugin
         run: |
           npm install
           npm run build
 
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.manifest.outputs.version }}" -m "v${{ steps.manifest.outputs.version }}"
+          git push origin "v${{ steps.manifest.outputs.version }}"
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag="${GITHUB_REF#refs/tags/}"
+          tag="v${{ steps.manifest.outputs.version }}"
 
           gh release create "$tag" \
             --title="$tag" \
