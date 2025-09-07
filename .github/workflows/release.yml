@@ -42,8 +42,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v${{ steps.manifest.outputs.version }}"
-
+          
+          args="main.js manifest.json"
+          [ -f styles.css ] && args="$args styles.css"
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            main.js manifest.json styles.css
+            $args
