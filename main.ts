@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { Buffer } from 'buffer';
-import mime from 'mime';
+import * as mime from 'mime';
 
 import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, requestUrl } from 'obsidian';
 
