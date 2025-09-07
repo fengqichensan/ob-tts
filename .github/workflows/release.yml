@@ -27,6 +27,7 @@ jobs:
       - name: Build plugin
         run: |
           npm install
+          npm i -D @types/mime
           npm run build
 
       - name: Create Git tag
