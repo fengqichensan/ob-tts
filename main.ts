@@ -198,13 +198,49 @@ class ObTtsSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('Voice')
 			.setDesc('用于语音合成的语音名称（例如：Sadaltager）')
-			.addText(text => text
-				.setPlaceholder('Enter the voice')
-				.setValue(this.plugin.settings.voice)
-				.onChange(async (value) => {
+			.addDropdown(dropdown => {
+				// 语音名称列表：https://ai.google.dev/gemini-api/docs/speech-generation#voices
+				const voices: Record<string, string> = {
+					Zephyr: 'Zephyr - 明亮',
+					Puck: 'Puck - 欢快',
+					Charon: 'Charon - 信息丰富',
+					Kore: 'Kore - 坚定',
+					Fenrir: 'Fenrir - 活泼',
+					Leda: 'Leda - 年轻',
+					Orus: 'Orus - 坚定',
+					Aoede: 'Aoede - 轻快',
+					Callirrhoe: 'Callirrhoe - 随和',
+					Autonoe: 'Autonoe - 明亮',
+					Enceladus: 'Enceladus - 气声',
+					Iapetus: 'Iapetus - 清晰',
+					Umbriel: 'Umbriel - 随和',
+					Algieba: 'Algieba - 平滑',
+					Despina: 'Despina - 平滑',
+					Erinome: 'Erinome - 清晰',
+					Algenib: 'Algenib - 沙哑',
+					Rasalgethi: 'Rasalgethi - 信息丰富',
+					Laomedeia: 'Laomedeia - 欢快',
+					Achernar: 'Achernar - 柔和',
+					Alnilam: 'Alnilam - 坚定',
+					Schedar: 'Schedar - 均匀',
+					Gacrux: 'Gacrux - 成熟',
+					Pulcherrima: 'Pulcherrima - 直率',
+					Achird: 'Achird - 友好',
+					Zubenelgenubi: 'Zubenelgenubi - 随意',
+					Vindemiatrix: 'Vindemiatrix - 温和',
+					Sadachbia: 'Sadachbia - 活泼',
+					Sadaltager: 'Sadaltager - 知识渊博',
+					Sulafat: 'Sulafat - 温暖',
+				};
+				for (const [key, label] of Object.entries(voices)) {
+					dropdown.addOption(key, label);
+				}
+				dropdown.setValue(this.plugin.settings.voice);
+				dropdown.onChange(async (value) => {
 					this.plugin.settings.voice = value;
-					await this.plugin.saveSettings(); // 保存设置
-				}));
+					await this.plugin.saveSettings();
+				});
+			});
 
 		// 添加风格指令设置项（目前未实现功能）
 		new Setting(containerEl)
