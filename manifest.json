@@ -1,7 +1,7 @@
 {
   "id": "ob-tts",
   "name": "ob tts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minAppVersion": "0.15.0",
   "description": "ob tts 是一个为 Obsidian 设计的文字转语音（Text-to-Speech, TTS）插件。",
   "author": "fengqichensan",
