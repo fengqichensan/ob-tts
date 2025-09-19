@@ -1,6 +1,6 @@
 {
 	"name": "ob-tts",
-	"version": "1.0.0",
+	"version": "1.0.3",
 	"description": "ob-tts 是一个为 Obsidian 设计的文字转语音（Text-to-Speech, TTS）插件。",
 	"main": "main.js",
 	"scripts": {

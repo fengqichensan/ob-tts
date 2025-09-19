@@ -4,11 +4,15 @@ ob-tts 是一个为 [Obsidian](https://obsidian.md) 设计的文字转语音（T
 
 ## 功能特性
 - **文本转语音**: 通过右键菜单将选中的文本转换为语音。
-- **集成 Google Gemini**: 利用强大的 Google Gemini API (`gemini-2.5-flash-preview-tts` 模型) 生成高质量音频。
+- **集成 Google Gemini**: 利用强大的 Google Gemini API 生成高质量音频。
+- **多模型支持**: 支持选择不同的 Gemini 模型，包括：
+  - gemini-2.5-flash-preview-tts（默认）
+  - gemini-2.5-pro-preview-tts
 - **自动保存与链接**: 生成的 `.wav` 音频文件会自动保存到您的 Obsidian 笔记库中，并以链接形式插入到当前笔记。
 - **即时播放**: 语音生成后会自动播放，方便您即时收听。
 - **高度可配置**:
     - 设置您的 Google Gemini API 密钥。
+    - 选择用于语音合成的 Gemini 模型。
     - 自定义用于语音合成的语音名称。
     - 指定音频文件的保存文件夹。
 
@@ -23,10 +27,11 @@ ob-tts 是一个为 [Obsidian](https://obsidian.md) 设计的文字转语音（T
 ## 使用方法
 
 1. **配置 API 密钥**:
-   - 打开 Obsidian 的“设置”面板。
-   - 在左侧导航栏中找到并点击 “ob-tts”。
-   - 在 “API Key” 字段中输入您的 Google Gemini API 密钥。您可以从 [Google AI Studio](https://aistudio.google.com/app/apikey) 获取密钥。
-   - （可选）配置“语音名称”和“保存文件夹”。
+   - 打开 Obsidian 的"设置"面板。
+   - 在左侧导航栏中找到并点击 "ob-tts"。
+   - 在 "API Key" 字段中输入您的 Google Gemini API 密钥。您可以从 [Google AI Studio](https://aistudio.google.com/app/apikey) 获取密钥。
+   - （可选）在 "Model" 下拉菜单中选择您想要使用的 Gemini 模型。
+   - （可选）配置"语音名称"和"保存文件夹"。
 
 2. **转换文本为语音**:
    - 在任意笔记中，用鼠标选中您想要转换的文本。

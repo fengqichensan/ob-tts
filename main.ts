@@ -10,6 +10,7 @@ interface ObTtsSettings {
     voice: string;
     styleInstructions: string;
     saveFolder: string;
+    model: string;
 }
 
 // 默认设置值
@@ -17,7 +18,8 @@ const DEFAULT_SETTINGS: ObTtsSettings = {
     apiKey: '',
     voice: 'Sadaltager', // 默认语音名称
     styleInstructions: 'Read aloud in a warm and friendly tone: ',
-    saveFolder: ''
+    saveFolder: '',
+    model: 'gemini-2.5-flash-preview-tts' // 默认模型
 }
 
 // 定义WAV转换选项接口，包含声道数、采样率和每个样本的位数
@@ -91,7 +93,7 @@ export default class ObTtsPlugin extends Plugin {
 
         // 初始化Google Gemini AI客户端，使用用户设置的API密钥
         const ai = new GoogleGenAI({ apiKey: this.settings.apiKey });
-        const model = 'gemini-2.5-flash-preview-tts'; // 使用的模型名称
+        const model = this.settings.model; // 使用设置中的模型名称
         // 配置参数，包含温度、响应类型为音频以及语音配置
         const config = {
             temperature: 1,
@@ -206,6 +208,25 @@ class ObTtsSettingTab extends PluginSettingTab {
                     this.plugin.settings.apiKey = value;
                     await this.plugin.saveSettings(); // 保存设置
                 }));
+
+        // 添加模型选择设置项
+        new Setting(containerEl)
+            .setName('Model')
+            .setDesc('选择用于语音合成的Gemini模型')
+            .addDropdown(dropdown => {
+                const models: Record<string, string> = {
+                    'gemini-2.5-flash-preview-tts': 'gemini-2.5-flash-preview-tts',
+                    'gemini-2.5-pro-preview-tts': 'gemini-2.5-pro-preview-tts'
+                };
+                for (const [key, label] of Object.entries(models)) {
+                    dropdown.addOption(key, label);
+                }
+                dropdown.setValue(this.plugin.settings.model);
+                dropdown.onChange(async (value) => {
+                    this.plugin.settings.model = value;
+                    await this.plugin.saveSettings();
+                });
+            });
 
         // 添加语音名称设置项
         new Setting(containerEl)
