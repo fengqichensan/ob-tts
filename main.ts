@@ -179,6 +179,114 @@ export default class ObTtsPlugin extends Plugin {
       }
     });
   }
+
+    // 扫描所有markdown文件中的音频引用
+    async scanAudioReferences(): Promise<Set<string>> {
+        const referencedFiles = new Set<string>();
+        const markdownFiles = this.app.vault.getMarkdownFiles();
+        
+        for (const file of markdownFiles) {
+            const content = await this.app.vault.read(file);
+            // 匹配音频标签中的src属性
+            const audioRegex = /<audio[^>]+src=["']([^"']+)["'][^>]*>/g;
+            let match;
+            
+            while ((match = audioRegex.exec(content)) !== null) {
+                const audioPath = match[1];
+                // 如果是相对路径，转换为绝对路径
+                if (!audioPath.startsWith('/')) {
+                    referencedFiles.add(audioPath);
+                } else {
+                    referencedFiles.add(audioPath.substring(1)); // 移除开头的斜杠
+                }
+            }
+        }
+        
+        return referencedFiles;
+    }
+
+    // 获取保存文件夹中的所有音频文件
+    async getAudioFiles(): Promise<string[]> {
+        const audioFiles: string[] = [];
+        const saveFolder = this.settings.saveFolder || '';
+        
+        if (!saveFolder || saveFolder.trim() === '') {
+            // 如果没有设置保存文件夹，扫描根目录
+            const files = this.app.vault.getFiles();
+            for (const file of files) {
+                if (file.name.startsWith('tts-') && file.name.endsWith('.wav')) {
+                    audioFiles.push(file.path);
+                }
+            }
+        } else {
+            // 扫描指定的保存文件夹
+            try {
+                // 删除saveFolder开头的/
+                const cleanedSaveFolder = saveFolder.replace(/^\/+/, '');
+                const folderExists = await this.app.vault.adapter.exists(cleanedSaveFolder);
+                if (folderExists) {
+                    const files = this.app.vault.getFiles();
+                    for (const file of files) {
+                        if (file.path.startsWith(cleanedSaveFolder) && 
+                            file.name.startsWith('tts-') && 
+                            file.name.endsWith('.wav')) {
+                            audioFiles.push(file.path);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error scanning audio folder:', error);
+            }
+        }
+        
+        return audioFiles;
+    }
+
+    // 删除未被引用的音频文件
+    async cleanupUnusedAudioFiles(): Promise<void> {
+        try {
+            new Notice('正在扫描音频文件引用...');
+            
+            // 获取所有被引用的音频文件
+            const referencedFiles = await this.scanAudioReferences();
+            
+            // 获取所有存在的音频文件
+            const allAudioFiles = await this.getAudioFiles();
+            
+            // 找出未被引用的文件
+            const unusedFiles: string[] = [];
+            for (const audioFile of allAudioFiles) {
+                if (!referencedFiles.has(audioFile)) {
+                    unusedFiles.push(audioFile);
+                }
+            }
+            
+            if (unusedFiles.length === 0) {
+                new Notice('没有找到未使用的音频文件。');
+                return;
+            }
+            
+            // 删除未使用的文件
+            let deletedCount = 0;
+            for (const filePath of unusedFiles) {
+                try {
+                    const file = this.app.vault.getAbstractFileByPath(filePath);
+                    if (file) {
+                        await this.app.vault.delete(file);
+                        deletedCount++;
+                    }
+                } catch (error) {
+                    console.error(`Error deleting file ${filePath}:`, error);
+                }
+            }
+            
+            new Notice(`已删除 ${deletedCount} 个未使用的音频文件。`);
+            
+        } catch (error) {
+            console.error('Error cleaning up audio files:', error);
+            new Notice('清理音频文件时出错，请查看控制台。');
+        }
+    }
 }
 
 // 插件设置面板类，继承自PluginSettingTab
@@ -299,6 +407,22 @@ class ObTtsSettingTab extends PluginSettingTab {
                     this.plugin.settings.saveFolder = value;
                     await this.plugin.saveSettings(); // 保存设置
                 }));
+
+        // 添加清理未使用音频文件的按钮
+        new Setting(containerEl)
+            .setName('清理音频文件')
+            .setDesc('删除所有未被markdown文件引用的音频文件')
+            .addButton(button => button
+                .setButtonText('删除未使用的音频文件')
+                .setCta()
+                .onClick(async () => {
+                    // 添加确认对话框
+                    const confirmed = confirm('确定要删除所有未使用的音频文件吗？此操作不可撤销。');
+                    if (confirmed) {
+                        await this.plugin.cleanupUnusedAudioFiles();
+                    }
+                }));
+
     }
 }
 
